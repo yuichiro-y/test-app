@@ -5,6 +5,14 @@ export const PostDetail = () => {
   const { id } = useParams();
   const post = posts.find(p => p.id === Number(id));
 
+  if (!post) {
+    return (
+      <div>
+        <p className="p-5">記事が見つかりません。</p>
+      </div>
+    );
+  }
+
   return (
     <article className="max-w-2xl mx-auto my-10 px-2">
       <div key={post.id}>
