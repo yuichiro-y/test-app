@@ -14,8 +14,7 @@ export const PostDetail = () => {
   }
 
   return (
-    <article className="max-w-2xl mx-auto my-10 px-2">
-      <div key={post.id}>
+    <article key={post.id} className="max-w-2xl mx-auto my-10 px-2">
         <img src={post.thumbnailUrl} className="mb-5"/>
 
         <div className="px-5">
@@ -30,8 +29,6 @@ export const PostDetail = () => {
             <h1 className="text-2xl py-3">{post.title}</h1>
             <div className=""dangerouslySetInnerHTML={{ __html: post.content }} />
           </div>
-          
-        </div>
 
       </div>
     </article>
