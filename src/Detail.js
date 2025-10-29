@@ -1,9 +1,52 @@
 import { useParams } from "react-router-dom";
-import {posts} from "./data/posts";
+import { useEffect, useState } from "react";
 
 export const PostDetail = () => {
+
+  const [posts , setPosts] = useState([]);
+  const [loading , setLoading] = useState(true);
+  const [error , setError] = useState(false);
+  useEffect(()=> {
+    const fetcher = async() =>{
+      try {
+        setLoading(true);
+
+        const res = await fetch("https://1hmfpsvto6.execute-api.ap-northeast-1.amazonaws.com/dev/posts")
+      
+        if (!res.ok) {
+        throw new Error(`HTTPエラー: ${res.status}`);
+      }
+
+        const data = await res.json()
+        setPosts(data.posts)
+      } catch (err){
+        console.log(err);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetcher()
+  },[])
+  
   const { id } = useParams();
   const post = posts.find(p => p.id === Number(id));
+  
+ if(loading === true){
+  return(
+      <div>
+        <p className="p-5">読み込み中...</p>
+      </div>
+  );
+ }
+
+  if (error) {
+    return (
+      <div>
+        <p className="p-5">データが取得できません。</p>
+      </div>
+    );
+  }
 
   if (!post) {
     return (
