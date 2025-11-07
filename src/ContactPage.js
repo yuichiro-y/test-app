@@ -2,27 +2,34 @@ import { useState } from "react";
 
 export const Contact = ()=> { 
 
+  // フォームの入力値を保持
   const [values ,setValues] = useState({
     name: "",
     email: "",
     body: ""
   });
 
+  // 入力欄のエラーメッセージを保持
   const [errors, setErrors] = useState({
     name: "",
     email: "",
     body: ""
   });
 
+  // 送信ボタン押下時の処理
   const handleSubmit = (e) => {
     e.preventDefault();
+    // エラー内容の初期化
     const newErrors = {name: "", email: "", body: ""};
+
+    // 未入力の場合エラーメッセージをセット
     if (!values.name.trim()) newErrors.name = "お名前は必須です。";
     if (!values.email.trim()) newErrors.email = "メールアドレスは必須です。";
     if (!values.body.trim()) newErrors.body = "本文は必須です。";
 
-    setErrors(newErrors);
+    setErrors(newErrors); // state更新（赤字表示される）
 
+    // ALL OKで送信
     const hasError = Object.values(newErrors).some((v)=>v);
     if (hasError) return;
 
@@ -30,12 +37,17 @@ export const Contact = ()=> {
 
   }
 
+  // 入力中に state を更新する処理
   const handleChange = (e) => {
-  const { name, value } = e.target;
-  setValues((prev) => ({ ...prev, [name]: value }));
-  setErrors((prev) => ({ ...prev, [name]: "" }));
+    const { name, value } = e.target;
+
+    // 更新
+    setValues((prev) => ({ ...prev, [name]: value }));
+    // 入力されるとエラーを消す
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
+  // クリアボタン
   const handleClear = () =>{
     setValues({name:"",email:"",body:""});
     setErrors({name:"",email:"",body:""});
@@ -46,6 +58,7 @@ export const Contact = ()=> {
     <main className="max-w-2xl mx-auto my-10 px-2 text-left">
       <h1 className="font-bold text-2xl mb-5">お問い合わせフォーム</h1>
       <form noValidate onSubmit={handleSubmit}>
+
         {/* お名前 */}
         <div className="mb-5">
           <div className="items-center flex justify-between">
@@ -118,6 +131,7 @@ export const Contact = ()=> {
           </div>
         </div>
 
+        {/* ボタン */}
         <div className="flex justify-center mt-10">
           <button 
             type="submit"
