@@ -16,26 +16,70 @@ export const Contact = ()=> {
     body: ""
   });
 
+  // 送信中フラグ
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // バリデーション
+  const validate = (v) => {
+    const e = { name: "" , email: "" , body: ""};
+
+    const nameLen = v.name.trim().length;
+    if (!nameLen) e.name = "お名前は必須です。";
+    else if (nameLen > 30) e.name = "お名前は30文字以内で入力してください。" ;
+
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValidEmail = (s) => EMAIL_RE.test(s.trim());
+    if (!v.email.trim()) e.email = "メールアドレスは必須です。";
+    else if (!isValidEmail(values.email)) e.email = "メールアドレスの形式が不正です。";
+
+    const bodyLen = v.body.trim().length;
+    if (!bodyLen) e.body = "本文は必須です。";
+    else if (bodyLen > 500) e.body = "本文は500文字以内で入力してください。";
+
+    return e;
+  }
+
   // 送信ボタン押下時の処理
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // エラー内容の初期化
-    const newErrors = {name: "", email: "", body: ""};
-
-    // 未入力の場合エラーメッセージをセット
-    if (!values.name.trim()) newErrors.name = "お名前は必須です。";
-    if (!values.email.trim()) newErrors.email = "メールアドレスは必須です。";
-    if (!values.body.trim()) newErrors.body = "本文は必須です。";
-
+    const newErrors = validate(values);
     setErrors(newErrors); // state更新（赤字表示される）
 
-    // ALL OKで送信
-    const hasError = Object.values(newErrors).some((v)=>v);
+    const hasError = Object.values(newErrors).some(Boolean);
     if (hasError) return;
 
-    alert("送信しました。")
+    try {
+      setIsSubmitting(true);
 
-  }
+      const payload = {
+        name: values.name.trim(),
+        email: values.email.trim(),
+        message: values.body.trim()
+      }
+
+      const res = await fetch("https://1hmfpsvto6.execute-api.ap-northeast-1.amazonaws.com/dev/contacts",
+        {
+          method: "post",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("送信に失敗しました。");
+      }
+      alert("送信しました。")
+      setValues({ name: "", email: "", body: "" });
+      setErrors({ name: "", email: "", body: "" });
+      } catch (err){
+        console.error(err);
+        alert(err.message);
+      } finally {
+        setIsSubmitting(false);
+      }
+  } 
+
 
   // 入力中に state を更新する処理
   const handleChange = (e) => {
@@ -53,20 +97,22 @@ export const Contact = ()=> {
     setErrors({name:"",email:"",body:""});
   }
 
+
   return (
   <>
-    <main className="max-w-2xl mx-auto my-10 px-2 text-left">
-      <h1 className="font-bold text-2xl mb-5">お問い合わせフォーム</h1>
+    <main className="max-w-[800px] mx-auto my-10 px-2 text-left">
+      <h1 className="font-bold text-xl mb-9">お問い合わせフォーム</h1>
       <form noValidate onSubmit={handleSubmit}>
 
         {/* お名前 */}
-        <div className="mb-5">
+        <div className="mb-6">
           <div className="items-center flex justify-between">
             <label className="w-[240px]" htmlFor="name">お名前</label>
             <div className="w-full">
               <input id="name" name="name" type="text" 
                 className={`p-3 w-full rounded-lg border border-gray-300 ${errors.name ? "border-red-400" : "border-gray-300"}`}
                 value={values.name}
+                required
                 onChange={handleChange}
                 aria-invalid={!!errors.name}
                 aria-describedby="name-error"
@@ -82,7 +128,7 @@ export const Contact = ()=> {
         </div>
 
         {/* メールアドレス */}
-        <div className="mb-5">
+        <div className="mb-6">
           <div className="items-center flex justify-between">
             <label className="w-[240px]" htmlFor="email">メールアドレス</label>
             <div className="w-full">
@@ -92,6 +138,7 @@ export const Contact = ()=> {
                 type="email"
                 className={`p-3 w-full rounded-lg border border-gray-300 ${errors.email ? "border-red-400" : "border-gray-300"}`}
                 value={values.email}
+                required
                 onChange={handleChange}
                 aria-invalid={!!errors.email}
                 aria-describedby="email-error"
@@ -107,7 +154,7 @@ export const Contact = ()=> {
         </div>
 
         {/* 本文 */}
-        <div className="mb-5">
+        <div className="mb-6">
           <div className="items-center flex justify-between">
             <label className="w-[240px]" htmlFor="body">本文</label>
             <div className="w-full">
@@ -115,8 +162,9 @@ export const Contact = ()=> {
                 id="body"
                 name="body"
                 type="text"
-                className={`p-3 w-full rounded-lg border border-gray-300 ${errors.body ? "border-red-400" : "border-gray-300"}`}
+                className={`p-3 w-full h-48 rounded-lg border border-gray-300 ${errors.body ? "border-red-400" : "border-gray-300"}`}
                 value={values.body}
+                required
                 onChange={handleChange}
                 aria-invalid={!!errors.body}
                 aria-describedby="body-error"
@@ -135,6 +183,8 @@ export const Contact = ()=> {
         <div className="flex justify-center mt-10">
           <button 
             type="submit"
+            disabled={isSubmitting}
+            onClick={handleSubmit}
             className="mr-3 py-2 px-3 font-bold rounded-lg bg-black text-gray-50 border border-black"
           >送信</button>
           <button 
