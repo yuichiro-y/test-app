@@ -136,6 +136,7 @@ export const Contact = ()=> {
                 id="email"
                 name="email"
                 type="email"
+                disabled={isSubmitting}
                 className={`p-3 w-full rounded-lg border border-gray-300 ${errors.email ? "border-red-400" : "border-gray-300"}`}
                 value={values.email}
                 required
@@ -162,6 +163,7 @@ export const Contact = ()=> {
                 id="body"
                 name="body"
                 type="text"
+                disabled={isSubmitting}
                 className={`p-3 w-full h-48 rounded-lg border border-gray-300 ${errors.body ? "border-red-400" : "border-gray-300"}`}
                 value={values.body}
                 required
