@@ -70,8 +70,8 @@ export const Contact = ()=> {
         throw new Error("送信に失敗しました。");
       }
       alert("送信しました。")
-      setValues({ name: "", email: "", body: "" });
-      setErrors({ name: "", email: "", body: "" });
+      handleClear();
+
       } catch (err){
         console.error(err);
         alert(err.message);
@@ -109,7 +109,11 @@ export const Contact = ()=> {
           <div className="items-center flex justify-between">
             <label className="w-[240px]" htmlFor="name">お名前</label>
             <div className="w-full">
-              <input id="name" name="name" type="text" 
+              <input 
+                id="name" 
+                name="name" 
+                type="text"
+                disabled={isSubmitting}
                 className={`p-3 w-full rounded-lg border border-gray-300 ${errors.name ? "border-red-400" : "border-gray-300"}`}
                 value={values.name}
                 required
@@ -191,6 +195,7 @@ export const Contact = ()=> {
           >送信</button>
           <button 
             type="button"
+            disabled={isSubmitting}
             className="py-2 px-3 font-bold rounded-lg bg-gray-300 text-black border "
             onClick={handleClear}
           >クリア</button>
